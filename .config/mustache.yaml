@@ -1,0 +1,12 @@
+{
+  project:
+    {
+      description:
+        "Autodocodec provides generic codecs to convert between many data
+         formats. This adds Dhall to the list of formats.",
+      name: "autodocodec-dhall",
+      repo: "sellout/autodocodec-dhall",
+      summary: "Autodocodec support for Dhall files",
+    },
+  type: { name: "haskell" },
+}
