@@ -91,7 +91,11 @@
         ## NB: Dependencies that are overridden because they are broken in
         ##     Nixpkgs should be pushed upstream to Flaky. This is for
         ##     dependencies that we override for reasons local to the project.
-        haskellDependencies = final: prev: hfinal: hprev: {};
+        haskellDependencies = final: prev: hfinal: hprev: {
+          ## There is a revision on Hackage that widens the bounds to work with
+          ## GHC 9.10, so we just jailbreak for the same effect
+          repline = final.haskell.lib.doJailbreak hprev.repline;
+        };
       };
 
       homeConfigurations =
