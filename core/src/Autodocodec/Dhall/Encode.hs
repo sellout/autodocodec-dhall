@@ -28,7 +28,7 @@ import safe "base" Data.Monoid (mempty)
 import safe "base" Data.Ord ((<=))
 import safe "base" Data.Semigroup ((<>))
 import safe "base" Data.Tuple (snd, uncurry)
-import safe "base" GHC.Num (integerToNaturalClamp)
+import "base" GHC.Natural (naturalFromInteger)
 import qualified "dhall" Dhall.Core as Dhall
 import "dhall" Dhall.Map (Map)
 import qualified "dhall" Dhall.Map as Map
@@ -130,7 +130,11 @@ toDhallVia = flip go
       Autodo.IntegerCodec _ (Autodo.Bounds lower _) ->
         ( if maybe False (0 <=) lower
             then Dhall.IntegerLit
-            else Dhall.NaturalLit . integerToNaturalClamp
+            -- TODO: `GHC.Num.integerToNaturalClamp` is safer, but it was only
+            --       added in GHC 9.0. Even `naturalFromInteger` was only added
+            --       in base-4.10, which means we’ll need to do something else
+            --       if we get older compiler support to this point.
+            else Dhall.NaturalLit . naturalFromInteger
         )
           $ coerce a
       Autodo.NumberCodec _ _ ->
