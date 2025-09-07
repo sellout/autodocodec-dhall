@@ -131,7 +131,9 @@
           "9.6.3"
           "9.8.1"
           "9.10.1"
-          "9.12.1"
+          ## TODO: Dhall & other packages in Nixpkgs 25.05 don’t support GHC
+          ##       9.12 yet.
+          # "9.12.1"
           # "ghcHEAD" # doctest doesn’t work on current HEAD
         ];
 
@@ -164,8 +166,11 @@
             "9.6.4"
             "9.6.5"
             "9.8.2"
+            ## TODO: Some dependency requires an older version of `containers`.
             "9.10.2"
-            "9.12.2"
+            ## TODO: Dhall & other packages in Nixpkgs 25.05 don’t support GHC
+            ##       9.12 yet.
+            # "9.12.2"
           ];
 
         ## See
