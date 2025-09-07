@@ -7,5 +7,17 @@ program-options
 
 tests: True
 
+-- TODO: Even the latest release of Autodocodec is missing constraints on most
+--       of its dependencies, so we introduce some minimal (non-PVP) ones that
+--       should exist there.
+constraints:
+  -- Dhall depends on pretty-simple, but only has an upper bound. Newer versions
+  -- rely on features added in 0.3.0.
+  pretty-simple >= 0.3.0,
+  -- Before this version, validity had no bounds on `validity`, so Cabal happily
+  -- solves incompatible versions. Alternatively, validity-scientific-0.0.0.0
+  -- could be deprecated or have its bounds repaired.
+  validity-scientific >= 0.1.0,
+
 packages:
   ./core/autodocodec-dhall.cabal
