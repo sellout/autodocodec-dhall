@@ -24,12 +24,8 @@ import safe "base" Data.Maybe (Maybe, maybe)
 import safe "base" Data.Semigroup ((<>))
 import safe "base" Data.Void (Void)
 import safe "base" Text.Show (show)
-import qualified "dhall" Dhall.Marshal.Decode as Dhall
-  ( Decoder (Decoder),
-    RecordDecoder,
-    UnionDecoder,
-  )
-import qualified "dhall" Dhall.Marshal.Decode as Dhall.Decode
+import qualified "dhall" Dhall (Decoder (Decoder), RecordDecoder, UnionDecoder)
+import qualified "dhall" Dhall as Dhall.Decode
 import qualified "dhall" Dhall.Src as Dhall (Src)
 import qualified "either" Data.Either.Validation as Validation
 import safe "text" Data.Text (Text)
