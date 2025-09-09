@@ -223,8 +223,13 @@ test-suite doctests
   hs-source-dirs: tests
   main-is: doctests.hs
   build-depends:
-    doctest >= 0.16.0,
     autodocodec-dhall,
+    doctest >= 0.16.0,
+  -- For a few versions of GHC, doctest triggers some errors in macOS GitHub
+  -- workflows. See sol/doctest#474
+  if os(darwin) && impl(ghc >= 8.6.1 && < 9.0.1)
+    build-depends:
+      doctest < 1.24.1,
   if impl(ghc >= 8.10.1)
     ghc-options:
       -- `doctest` requires the package containing the doctests as a dependency
