@@ -192,12 +192,12 @@ library
     build-depends:
       -- Starting with version 0.3.0, Autodocodec uses `MonadFail`, which
       -- doesn’t exist until GHC 8.8.
-      autodocodec >= 0.1.0 && < 0.3.0,
+      autodocodec >= 0.2.0 && < 0.3.0,
   else
     build-depends:
       -- Before 0.1.0, autodocodec required an older version of Aeson than we
       -- solve for.
-      autodocodec >= 0.1.0,
+      autodocodec >= 0.2.0,
   -- Starting with version 1.42.2, Dhall uses `StandaloneKindSignatures`,
   -- which requires GHC 8.10+.
   if impl(ghc >= 8.10.1)
