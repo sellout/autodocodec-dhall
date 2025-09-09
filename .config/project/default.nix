@@ -64,6 +64,10 @@
     ghcVersions = self.lib.nonNixTestedGhcVersions;
     cabalPackages = {"${config.project.name}" = "core";};
     latestGhcVersion = "9.10.1";
+    extraDependencyVersions = [
+      ## Included in Nixpkgs 25.05, but not picked up by the GitHub build matrix.
+      "autodocodec-0.4.0.0"
+    ];
   };
 
   ## publishing

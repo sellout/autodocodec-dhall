@@ -99,7 +99,7 @@ flag noisy-deprecations
 common defaults
   import: GHC2024
   build-depends:
-    base,
+    base ^>= {4.12.0, 4.13.0, 4.14.0, 4.15.0, 4.16.0, 4.17.0, 4.18.0, 4.19.0, 4.20.0, 4.21.0},
   ghc-options:
   if impl(ghc >= 8.0.1)
     ghc-options:
@@ -167,7 +167,7 @@ custom-setup
     Cabal >= 3.0.0,
     -- `custom-setup` doesn’t support `import`, so we need to duplicate the
     -- `base` dependency range from `defaults`.
-    base,
+    base ^>= {4.12.0, 4.13.0, 4.14.0, 4.15.0, 4.16.0, 4.17.0, 4.18.0, 4.19.0, 4.20.0, 4.21.0},
     -- `cabal-plan-bounds` doesn’t check bounds for `custom-setup`, so this one
     -- is manually managed.
     cabal-doctest ^>= {1.0.0},
@@ -179,15 +179,15 @@ library
   --     the bounds here. See there for explanations if these bounds don’t work
   --     in your stack. I’m happy to support wider bounds when feasible.
   build-depends:
-    aeson,
-    autodocodec,
-    dhall,
-    either,
-    indexed-traversable,
-    scientific,
-    text,
-    unordered-containers,
-    vector,
+    aeson ^>= {2.0.2, 2.1.0, 2.2.0},
+    autodocodec ^>= {0.2.0, 0.3.0, 0.4.0, 0.5.0},
+    dhall ^>= {1.40.2, 1.41.1, 1.42.1},
+    either ^>= {5},
+    indexed-traversable ^>= {0.1.2},
+    scientific ^>= {0.3.7},
+    text ^>= {1.2.3, 2.0.1, 2.1},
+    unordered-containers ^>= {0.2.14},
+    vector ^>= {0.12.3, 0.13.0},
   exposed-modules:
     Autodocodec.Dhall.Decode
     Autodocodec.Dhall.Encode
@@ -199,7 +199,7 @@ test-suite doctests
   main-is: doctests.hs
   build-depends:
     autodocodec-dhall,
-    doctest,
+    doctest ^>={0.18.2, 0.20.1, 0.21.1, 0.22.2, 0.23.0, 0.24.2},
   if impl(ghc >= 8.10.1)
     ghc-options:
       -- `doctest` requires the package containing the doctests as a dependency
