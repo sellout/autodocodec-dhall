@@ -192,7 +192,7 @@ library
     build-depends:
       -- Starting with version 0.3.0, Autodocodec uses `MonadFail`, which
       -- doesn’t exist until GHC 8.8.
-      autodocodec >= 0.2.0 && < 0.3.0,
+      autodocodec >=0.2.0 && <0.6,
   else
     build-depends:
       -- Before 0.1.0, autodocodec required an older version of Aeson than we
