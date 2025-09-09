@@ -202,10 +202,10 @@ library
   -- which requires GHC 8.10+.
   if impl(ghc >= 8.10.1)
     build-depends:
-      dhall,
+      dhall >= 1.33.0,
   else
     build-depends:
-      dhall < 1.42.2,
+      dhall >= 1.33.0 && < 1.42.2,
   exposed-modules:
     Autodocodec.Dhall.Decode
     Autodocodec.Dhall.Encode

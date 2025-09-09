@@ -22,18 +22,16 @@ import safe "base" Data.Function (const, ($))
 import safe "base" Data.Functor (fmap, (<$>))
 import safe "base" Data.Maybe (Maybe, maybe)
 import safe "base" Data.Semigroup ((<>))
+import safe "base" Data.Tuple (snd)
 import safe "base" Data.Void (Void)
 import safe "base" Text.Show (show)
 import qualified "dhall" Dhall (Decoder (Decoder), RecordDecoder, UnionDecoder)
 import qualified "dhall" Dhall as Dhall.Decode
 import qualified "dhall" Dhall.Src as Dhall (Src)
 import qualified "either" Data.Either.Validation as Validation
+import safe "indexed-traversable" Data.Foldable.WithIndex (ifoldMap)
 import safe "text" Data.Text (Text)
 import safe qualified "text" Data.Text as Text
-#if MIN_VERSION_autodocodec(0, 2, 0)
-import safe "base" Data.Tuple (snd)
-import safe qualified "unordered-containers" Data.HashMap.Strict as HashMap
-#endif
 
 parseViaCodec :: (Autodo.HasCodec a) => Dhall.Decoder a
 parseViaCodec = parseVia Autodo.codec
@@ -117,15 +115,10 @@ parseObjectVia' = \case
   Autodo.OptionalKeyWithOmittedDefaultCodec k v def _ ->
     pure $ maybe (coerce def) coerce <$> parseOptionalField k v
   Autodo.PureCodec a -> pure $ pure a
-
--- Autodo.ApCodec f a -> pure $ parseObjectVia f <*> parseObjectVia a
-#if MIN_VERSION_autodocodec(0, 2, 0)
+  -- Autodo.ApCodec f a -> pure $ parseObjectVia f <*> parseObjectVia a
   Autodo.DiscriminatedUnionCodec _ _ u ->
     Left . fmap coerce $
-      HashMap.foldMapWithKey
-        (\k -> Dhall.Decode.constructor k . parseObjectVia . snd)
-        u
-#endif
+      ifoldMap (\k -> Dhall.Decode.constructor k . parseObjectVia . snd) u
 
 parseOptionalField :: Text -> Autodo.ValueCodec void a -> Dhall.RecordDecoder (Maybe a)
 parseOptionalField k = Dhall.Decode.field k . Dhall.Decode.maybe . parseVia

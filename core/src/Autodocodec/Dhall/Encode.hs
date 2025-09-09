@@ -34,10 +34,8 @@ import qualified "dhall" Dhall.Map as Map
 import safe "indexed-traversable" Data.Foldable.WithIndex (ifoldMap)
 import safe qualified "scientific" Data.Scientific as Scientific
 import safe "text" Data.Text (Text)
-import "vector" Data.Vector (Vector)
-#if MIN_VERSION_autodocodec(0, 2, 0)
 import safe qualified "unordered-containers" Data.HashMap.Strict as HashMap
-#endif
+import "vector" Data.Vector (Vector)
 #if MIN_VERSION_autodocodec(0, 4, 0)
 import safe "base" Data.Ord ((<=))
 import "base" GHC.Natural (naturalFromInteger)
@@ -117,11 +115,9 @@ toDhallObjectTypeVia =
       Autodo.PureCodec _ -> (True, [])
       Autodo.ApCodec oc1 oc2 ->
         (True, snd (dhallObjectType' oc1) <> snd (dhallObjectType' oc2))
-#if MIN_VERSION_autodocodec(0, 2, 0)
       -- @<c1 : v1, c2 : v2, …>@
       Autodo.DiscriminatedUnionCodec _ _ m ->
         (False, HashMap.toList $ toDhallObjectTypeVia . snd <$> m)
-#endif
 
 toDhallTypeVia :: Autodo.ValueCodec a void -> Dhall.Expr s a'
 toDhallTypeVia = fromMaybe (Dhall.Record Map.empty) . toDhallTypeVia'
@@ -190,7 +186,7 @@ toDhallVia = flip go
 
 -- makeMap a c =
 --   Dhall.ListLit (pure $ makeMapType c)
---     . HashMap.foldMapWithKey
+--     . ifoldMap
 --       ( \k ->
 --           pure
 --             . Dhall.RecordLit
