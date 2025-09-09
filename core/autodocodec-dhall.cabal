@@ -205,7 +205,7 @@ library
       dhall >= 1.33.0,
   else
     build-depends:
-      dhall >= 1.33.0 && < 1.42.2,
+      dhall >=1.33.0 && <1.43,
   exposed-modules:
     Autodocodec.Dhall.Decode
     Autodocodec.Dhall.Encode
