@@ -175,38 +175,19 @@ custom-setup
 library
   import: defaults
   hs-source-dirs: src
+  -- NB: The hard constraints are listed in the cabal.project file and inform
+  --     the bounds here. See there for explanations if these bounds don’t work
+  --     in your stack. I’m happy to support wider bounds when feasible.
   build-depends:
-    -- Before 1.4.5.0, Aeson didn’t have `JSONPathElement`, which is needed by
-    -- every version of Autodocodec.
-    aeson >= 1.4.5.0,
-    -- Before 0.1.0, autodocodec required an older version of Aeson than we
-    -- solve for.
-    autodocodec >= 0.2.0,
-    -- Dhall 1.33 added some error types that we use.
-    dhall >= 1.33.0,
+    aeson,
+    autodocodec,
+    dhall,
     either,
     indexed-traversable,
     scientific,
     text,
     unordered-containers,
-    -- Before 0.10.9.1, Vector didn’t work on any version of GHC that we support.
-    vector >= 0.10.9.1,
-  if impl(ghc < 8.8.1)
-    build-depends:
-      -- Starting with version 0.3.0, Autodocodec uses `MonadFail`, which
-      -- doesn’t exist until GHC 8.8.
-      autodocodec < 0.3.0,
-  elif impl(ghc >= 9.6.1)
-    build-depends:
-      -- Before 0.3.0, Autodocodec uses `>=>` without importing `Control.Monad`.
-      -- I’m not sure where it got it from, but it definitely stops working by
-      -- GHC 9.6.
-      autodocodec >= 0.3.0,
-  -- Starting with version 1.42.2, Dhall uses `StandaloneKindSignatures`,
-  -- which requires GHC 8.10+.
-  if impl(ghc < 8.10.1)
-    build-depends:
-      dhall < 1.42.2,
+    vector,
   exposed-modules:
     Autodocodec.Dhall.Decode
     Autodocodec.Dhall.Encode
@@ -218,12 +199,7 @@ test-suite doctests
   main-is: doctests.hs
   build-depends:
     autodocodec-dhall,
-    doctest >= 0.16.0,
-  -- For a few versions of GHC, doctest triggers some errors in macOS GitHub
-  -- workflows. See sol/doctest#474
-  if os(darwin) && impl(ghc >= 8.6.1 && < 9.0.1)
-    build-depends:
-      doctest < 1.24.1,
+    doctest,
   if impl(ghc >= 8.10.1)
     ghc-options:
       -- `doctest` requires the package containing the doctests as a dependency

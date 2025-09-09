@@ -18,13 +18,54 @@ tests: True
 --       of its dependencies, so we introduce some minimal (non-PVP) ones that
 --       should exist there.
 constraints:
+  -- Before 1.4.5.0, Aeson didn’t have `JSONPathElement`, which is needed by
+  -- every version of Autodocodec.
+  aeson >= 1.4.5.0,
+  -- Before 0.1.0, autodocodec required an older version of Aeson than we
+  -- solve for.
+  autodocodec >= 0.2.0,
+  -- tls-1.4.1 expects `MonadFail Get`, which was added in this version.
+  binary >= 0.8.3.0,
+  -- Dhall 1.33 added some error types that we use.
+  dhall >= 1.33.0,
   -- Dhall depends on pretty-simple, but only has an upper bound. Newer versions
   -- rely on features added in 0.3.0.
   pretty-simple >= 0.3.0,
-  -- Before this version, validity had no bounds on `validity`, so Cabal happily
-  -- solves incompatible versions. Alternatively, validity-scientific-0.0.0.0
-  -- could be deprecated or have its bounds repaired.
+  -- Before this version, `validity-scientific` had no bounds on `validity`, so
+  -- Cabal happily solves incompatible versions. Alternatively,
+  -- validity-scientific-0.0.0.0 could be deprecated or have its bounds
+  -- repaired.
   validity-scientific >= 0.1.0,
+if impl(ghc < 8.8.1)
+  constraints:
+    -- Starting with version 0.3.0, Autodocodec uses `MonadFail`, which
+    -- doesn’t exist until GHC 8.8.
+    autodocodec < 0.3.0,
+elif impl(ghc >= 9.6.1)
+  constraints:
+    -- Before 0.3.0, Autodocodec uses `>=>` without importing `Control.Monad`.
+    -- I’m not sure where it got it from, but it definitely stops working by
+    -- GHC 9.6.
+    autodocodec >= 0.3.0,
+if impl(ghc < 8.10.1)
+  constraints:
+    -- Starting with version 1.42.2, Dhall uses `StandaloneKindSignatures`,
+    -- which requires GHC 8.10+.
+    dhall < 1.42.2,
+-- For a few versions of GHC, doctest >= 0.24.1 triggers some errors in macOS
+-- GitHub workflows. See sol/doctest#474
+if os(darwin) && impl(ghc >= 8.6.1 && < 9.0.1)
+  constraints:
+    doctest < 0.24.1,
+-- The latest ghc-paths segfaults on some GHCs on macOS.
+if os(darwin) && impl(ghc >= 9.4.1 && < 9.6)
+  constraints:
+    ghc-paths < 0.1.0.12
+-- On some GHC versions on macOS, the FFI isn’t working, so use the “pure”
+-- backend there.
+if arch(arm) && os(darwin) && impl(ghc >= 9.2.1 && < 9.4)
+  package cryptohash-sha256
+    flags: +use-cbits
 
 packages:
   ./core/autodocodec-dhall.cabal
