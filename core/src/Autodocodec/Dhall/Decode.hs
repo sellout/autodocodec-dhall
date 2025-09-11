@@ -9,7 +9,7 @@ module Autodocodec.Dhall.Decode
   )
 where
 
-import qualified "autodocodec" Autodocodec as Autodo
+import "autodocodec" Autodocodec qualified as Autodo
 import safe "base" Control.Applicative
   ( pure, -- (<*>)
   )
@@ -25,13 +25,13 @@ import safe "base" Data.Semigroup ((<>))
 import safe "base" Data.Tuple (snd)
 import safe "base" Data.Void (Void)
 import safe "base" Text.Show (show)
-import qualified "dhall" Dhall (Decoder (Decoder), RecordDecoder, UnionDecoder)
-import qualified "dhall" Dhall as Dhall.Decode
-import qualified "dhall" Dhall.Src as Dhall (Src)
-import qualified "either" Data.Either.Validation as Validation
+import "dhall" Dhall qualified (Decoder (Decoder), RecordDecoder, UnionDecoder)
+import "dhall" Dhall qualified as Dhall.Decode
+import "dhall" Dhall.Src qualified as Dhall (Src)
+import "either" Data.Either.Validation qualified as Validation
 import safe "indexed-traversable" Data.Foldable.WithIndex (ifoldMap)
 import safe "text" Data.Text (Text)
-import safe qualified "text" Data.Text as Text
+import safe "text" Data.Text qualified as Text
 
 parseViaCodec :: (Autodo.HasCodec a) => Dhall.Decoder a
 parseViaCodec = parseVia Autodo.codec

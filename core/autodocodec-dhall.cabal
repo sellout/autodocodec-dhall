@@ -21,12 +21,6 @@ extra-doc-files:
   docs/*.md
 tested-with:
   GHC == {
-    8.6.1,
-    8.8.1,
-    8.10.1, 8.10.7,
-    9.0.1, 9.0.2,
-    9.2.1, 9.2.8,
-    9.4.1, 9.4.7,
     9.6.1, 9.6.3,
     9.8.1, 9.8.4,
     9.10.1,
@@ -53,9 +47,9 @@ common GHC2024
     DataKinds
     DeriveDataTypeable
     DeriveGeneric
-    -- DeriveLift -- uncomment if the oldest supported version is GHC 8.10.1+
+    DeriveLift
     DeriveTraversable
-    -- DerivingStrategies -- uncomment if the oldest supported version is GHC 8.2.1+
+    DerivingStrategies
     DisambiguateRecordFields
     DoAndIfThenElse
     EmptyCase
@@ -64,8 +58,8 @@ common GHC2024
     FlexibleInstances
     GADTs
     GeneralizedNewtypeDeriving
-    -- HexFloatLiterals -- uncomment if the oldest supported version is GHC 8.4.1+
-    -- ImportQualifiedPost -- uncomment if the oldest supported version is GHC 8.10.1+
+    HexFloatLiterals
+    ImportQualifiedPost
     InstanceSigs
     LambdaCase
     MagicHash
@@ -74,16 +68,16 @@ common GHC2024
     MultiParamTypeClasses
     NamedFieldPuns
     NamedWildCards
-    -- NumericUnderscores -- uncomment if the oldest supported version is GHC 8.6.1+
+    NumericUnderscores
     PolyKinds
     PostfixOperators
     RankNTypes
     RoleAnnotations
     ScopedTypeVariables
     StandaloneDeriving
-    -- StandaloneKindSignatures -- uncomment if the oldest supported version is GHC 8.10.1+
+    StandaloneKindSignatures
     TupleSections
-    -- TypeApplications -- uncomment if the oldest supported version is GHC 8.0.1+
+    TypeApplications
     TypeOperators
     UnicodeSyntax
 
@@ -118,44 +112,31 @@ common defaults
   else
     ghc-options:
       -Wall
-  -- remove if the oldest supported version is GHC 8.10.1+
-  if impl(ghc >= 8.10.1)
-    ghc-options:
-      -Wno-prepositive-qualified-module
-  -- remove if the oldest supported version is GHC 9.2.1+
-  if impl(ghc >= 9.2.1)
-    ghc-options:
-      -Wno-missing-kind-signatures
   if impl(ghc >= 9.8.1)
     ghc-options:
-      -- remove if the oldest supported version is GHC 9.2.1+
-      -Wno-missing-poly-kind-signatures
       -- Inference good.
       -Wno-missing-role-annotations
   default-extensions:
-    -- BlockArguments - uncomment if the oldest supported version is GHC 8.6.1+
+    BlockArguments
     DefaultSignatures
     ExplicitNamespaces
     FunctionalDependencies
     LiberalTypeSynonyms
-    -- replace with `LexicalNegation` if the oldest supported version is GHC 9.0.1+
-    NegativeLiterals
+    LexicalNegation
     PackageImports
     ParallelListComp
-    -- QualifiedDo - uncomment if the oldest supported version is GHC 9.0.1+
+    QualifiedDo
     RecursiveDo
     -- RequiredTypeArguments - uncomment if the oldest supported version is GHC 9.10.1+
-    -- TemplateHaskellQuotes - uncomment if the oldest supported version is GHC 8.0.1+
+    StrictData
+    TemplateHaskellQuotes
     TransformListComp
     NoGeneralizedNewtypeDeriving
     NoImplicitPrelude
     NoMonomorphismRestriction
     NoPatternGuards
-    -- NoStarIsType - uncomment if the oldest supported version is GHC 8.6.1+
-    -- NoTypeApplications - uncomment if the oldest supported version is GHC 8.0.1+
-  if impl(ghc >= 8.0.1)
-    default-extensions:
-      StrictData
+    NoStarIsType
+    NoTypeApplications
   if flag(noisy-deprecations)
     cpp-options: -DSELLOUT_NOISY_DEPRECATIONS
 
@@ -200,28 +181,18 @@ test-suite doctests
   build-depends:
     autodocodec-dhall,
     doctest ^>={0.18.2, 0.20.1, 0.21.1, 0.22.2, 0.23.0, 0.24.2},
-  if impl(ghc >= 8.10.1)
-    ghc-options:
-      -- `doctest` requires the package containing the doctests as a dependency
-      -- to ensure it gets built before this test-suite, even though the package
-      -- appears to be unused.
-      -Wno-unused-packages
   -- TODO: The sections below here are necessary because we don’t have control
   --       over the generated `Build_doctests.hs` file. So we have to silence
   --       all of its warnings one way or another.
-  if impl(ghc >= 8.0.1)
-    ghc-options:
-      -Wno-missing-import-lists
-      -Wno-safe
-  else
-    ghc-options:
-      -fno-warn-missing-import-lists
-  if impl(ghc >= 8.4.1)
-    ghc-options:
-      -Wno-missing-export-lists
-  if impl(ghc >= 8.8.1)
-    ghc-options:
-      -Wno-missing-deriving-strategies
+  ghc-options:
+    -Wno-missing-deriving-strategies
+    -Wno-missing-export-lists
+    -Wno-missing-import-lists
+    -Wno-safe
+    -- `doctest` requires the package containing the doctests as a dependency
+    -- to ensure it gets built before this test-suite, even though the package
+    -- appears to be unused.
+    -Wno-unused-packages
   default-extensions:
     -- Since we can’t add `{-# LANGUAGE Safe -#}` to the generated
     -- “Build_doctests.hs”, we set it here, and that means it has to match

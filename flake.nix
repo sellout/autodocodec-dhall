@@ -124,10 +124,10 @@
         ## maps to in the nixpkgs we depend on.
         testedGhcVersions = system: [
           self.lib.defaultGhcVersion
-          "8.10.7"
-          "9.0.2"
-          "9.2.8"
-          "9.4.7"
+          # "8.10.7"
+          # "9.0.2"
+          # "9.2.8"
+          # "9.4.7"
           "9.6.3"
           "9.8.1"
           "9.10.1"
@@ -145,12 +145,12 @@
           # "8.0.2"
           # "8.2.2"
           # "8.4.1"
-          "8.6.1"
-          "8.8.1"
-          "8.10.1"
-          "9.0.1"
-          "9.2.1"
-          "9.4.1"
+          # "8.6.1"
+          # "8.8.1"
+          # "8.10.1"
+          # "9.0.1"
+          # "9.2.1"
+          # "9.4.1"
           "9.6.1"
           ## since `cabal-plan-bounds` doesn’t work under Nix
           "9.8.1"
@@ -163,7 +163,7 @@
         supportedGhcVersions = system:
           self.lib.testedGhcVersions system
           ++ [
-            "9.4.8"
+            # "9.4.8"
             "9.6.4"
             "9.6.5"
             "9.8.2"

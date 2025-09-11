@@ -11,9 +11,9 @@ module Autodocodec.Dhall.Encode
   )
 where
 
-import qualified "aeson" Data.Aeson as JSON
-import qualified "autodocodec" Autodocodec.Aeson.Compat as Compat
-import qualified "autodocodec" Autodocodec.Codec as Autodo
+import "aeson" Data.Aeson qualified as JSON
+import "autodocodec" Autodocodec.Aeson.Compat qualified as Compat
+import "autodocodec" Autodocodec.Codec qualified as Autodo
 import safe "base" Control.Applicative (pure, (<*>))
 import safe "base" Control.Category (id, (.))
 import safe "base" Data.Bifunctor (bimap)
@@ -28,13 +28,13 @@ import safe "base" Data.Maybe (Maybe (Nothing), fromMaybe, maybe)
 import safe "base" Data.Monoid (mempty)
 import safe "base" Data.Semigroup ((<>))
 import safe "base" Data.Tuple (snd, uncurry)
-import qualified "dhall" Dhall.Core as Dhall
+import "dhall" Dhall.Core qualified as Dhall
 import "dhall" Dhall.Map (Map)
-import qualified "dhall" Dhall.Map as Map
+import "dhall" Dhall.Map qualified as Map
 import safe "indexed-traversable" Data.Foldable.WithIndex (ifoldMap)
-import safe qualified "scientific" Data.Scientific as Scientific
+import safe "scientific" Data.Scientific qualified as Scientific
 import safe "text" Data.Text (Text)
-import safe qualified "unordered-containers" Data.HashMap.Strict as HashMap
+import safe "unordered-containers" Data.HashMap.Strict qualified as HashMap
 import "vector" Data.Vector (Vector)
 #if MIN_VERSION_autodocodec(0, 4, 0)
 import safe "base" Data.Ord ((<=))
