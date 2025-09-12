@@ -93,25 +93,16 @@ flag noisy-deprecations
 common defaults
   import: GHC2024
   build-depends:
-    base ^>= {4.12.0, 4.13.0, 4.14.0, 4.15.0, 4.16.0, 4.17.0, 4.18.0, 4.19.0, 4.20.0, 4.21.0},
+    base ^>= {4.18.0, 4.19.0, 4.20.0, 4.21.0},
   ghc-options:
-  if impl(ghc >= 8.0.1)
-    ghc-options:
-      -Weverything
-      -- This one just reports unfixable things, AFAICT.
-      -Wno-all-missed-specialisations
-      -- Type inference good.
-      -Wno-missing-local-signatures
-      -- Warns even when `Unsafe` is explicit, not inferred. See
-      -- https://gitlab.haskell.org/ghc/ghc/-/issues/16689
-      -Wno-unsafe
-    if impl(ghc < 8.8.1)
-      ghc-options:
-        -- This used to warn even when `Safe` was explicit.
-        -Wno-safe
-  else
-    ghc-options:
-      -Wall
+    -Weverything
+    -- This one just reports unfixable things, AFAICT.
+    -Wno-all-missed-specialisations
+    -- Type inference good.
+    -Wno-missing-local-signatures
+    -- Warns even when `Unsafe` is explicit, not inferred. See
+    -- https://gitlab.haskell.org/ghc/ghc/-/issues/16689
+    -Wno-unsafe
   if impl(ghc >= 9.8.1)
     ghc-options:
       -- Inference good.
@@ -148,45 +139,54 @@ custom-setup
     Cabal >= 3.0.0,
     -- `custom-setup` doesn’t support `import`, so we need to duplicate the
     -- `base` dependency range from `defaults`.
-    base ^>= {4.12.0, 4.13.0, 4.14.0, 4.15.0, 4.16.0, 4.17.0, 4.18.0, 4.19.0, 4.20.0, 4.21.0},
+    base ^>= {4.18.0, 4.19.0, 4.20.0, 4.21.0},
     -- `cabal-plan-bounds` doesn’t check bounds for `custom-setup`, so this one
     -- is manually managed.
     cabal-doctest ^>= {1.0.0},
 
 library
   import: defaults
-  hs-source-dirs: src
+  hs-source-dirs:
+    src
   -- NB: The hard constraints are listed in the cabal.project file and inform
   --     the bounds here. See there for explanations if these bounds don’t work
   --     in your stack. I’m happy to support wider bounds when feasible.
   build-depends:
-    aeson ^>= {2.0.2, 2.1.0, 2.2.0},
-    autodocodec ^>= {0.2.0, 0.3.0, 0.4.0, 0.5.0},
-    dhall ^>= {1.40.2, 1.41.1, 1.42.1},
-    either ^>= {5},
-    indexed-traversable ^>= {0.1.2},
-    scientific ^>= {0.3.7},
-    text ^>= {1.2.3, 2.0.1, 2.1},
-    unordered-containers ^>= {0.2.14},
-    vector ^>= {0.12.3, 0.13.0},
+    aeson ^>= {2.2.3},
+    autodocodec ^>= {0.4.0, 0.5.0},
+    containers ^>= {0.6.7, 0.7},
+    contravariant ^>= {1.5.5},
+    dhall ^>= {1.42.3},
+    either ^>= {5.0.3},
+    hashable ^>= {1.4.7, 1.5.0},
+    indexed-traversable ^>= {0.1.4},
+    scientific ^>= {0.3.8},
+    semigroupoids ^>= {6.0.1},
+    text ^>= {2.0.2, 2.1},
+    unordered-containers ^>= {0.2.20},
+    vector ^>= {0.13.2},
   exposed-modules:
+    Autodocodec.Dhall
+  other-modules:
     Autodocodec.Dhall.Decode
     Autodocodec.Dhall.Encode
 
 test-suite doctests
   import: defaults
   type: exitcode-stdio-1.0
-  hs-source-dirs: tests
+  hs-source-dirs:
+    tests
   main-is: doctests.hs
   build-depends:
     autodocodec-dhall,
-    doctest ^>={0.18.2, 0.20.1, 0.21.1, 0.22.2, 0.23.0, 0.24.2},
+    doctest ^>= {0.24.2},
   -- TODO: The sections below here are necessary because we don’t have control
   --       over the generated `Build_doctests.hs` file. So we have to silence
   --       all of its warnings one way or another.
   ghc-options:
     -Wno-missing-deriving-strategies
     -Wno-missing-export-lists
+    -Wno-missing-kind-signatures
     -Wno-missing-import-lists
     -Wno-safe
     -- `doctest` requires the package containing the doctests as a dependency
@@ -198,3 +198,27 @@ test-suite doctests
     -- “Build_doctests.hs”, we set it here, and that means it has to match
     -- doctests.hs, which is `Unsafe`.
     Unsafe
+
+test-suite spec
+  import: defaults
+  type: exitcode-stdio-1.0
+  hs-source-dirs:
+    tests
+  main-is: spec.hs
+  build-depends:
+    autodocodec ^>= {0.4.0, 0.5.0},
+    autodocodec-dhall,
+    dhall ^>= {1.42.3},
+    hspec ^>= {2.11.13},
+    hspec-expectations ^>= {0.8.4},
+    prettyprinter ^>= {1.7.1},
+    string-interpolate ^>= {0.3.4},
+    text ^>= {2.0.2, 2.1},
+    vector ^>= {0.13.2},
+  other-modules:
+    Paths_autodocodec_dhall
+    Spec.DecodeSpec
+    Spec.EncodeSpec
+    Spec.Types
+  build-tool-depends:
+    hspec-discover:hspec-discover

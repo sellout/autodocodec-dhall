@@ -21,10 +21,18 @@ constraints:
   -- Before 1.4.5.0, Aeson didn’t have `JSONPathElement`, which is needed by
   -- every version of Autodocodec.
   aeson >= 1.4.5.0,
+  -- Before this, it relied on packages in older versions of MTL than are
+  -- provided by any GHC we support.
+  asn1-data >= 0.4.0,
+  -- Either this or 0.10.0 to ensure we have a reasonable bytestring depedency
+  -- listed.
+  attoparsec -split-base,
   -- Before 0.3.0, Autodocodec uses `>=>` without importing `Control.Monad`.
   -- I’m not sure where it got it from, but it definitely stops working by
   -- GHC 9.6.
-  autodocodec >= 0.3.0,
+  -- Before 0.4.0, Autodocodec doesn’t have an `IntegerCodec`, and bounds are
+  -- handled differently.
+  autodocodec >= 0.4.0,
   -- tls-1.4.1 expects `MonadFail Get`, which was added in this version.
   binary >= 0.8.3.0,
   -- Dhall 1.33 added some error types that we use.
