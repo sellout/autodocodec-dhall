@@ -22,6 +22,7 @@ import safe "base" Data.Maybe (Maybe (Nothing))
 import safe "base" Data.String (String)
 import safe "base" Data.Tuple (uncurry)
 import safe "base" Data.Void (Void)
+import safe "containers" Data.Map.Strict qualified as Map
 import "dhall" Dhall.Core qualified as Dhall (Expr (..))
 import "dhall" Dhall.Marshal.Encode qualified as Dhall
   ( Encoder (Encoder),
@@ -99,6 +100,13 @@ encode = do
     it "applies a function to the input side" do
       (This.encode $ Autodo.lmapCodec (* 2) Autodo.codec, 5 :: Int)
         `shouldShow'` "+10 : Integer"
+  describe "map" do
+    it "emits keys as Text, so they can be read back" do
+      (This.encode Autodo.codec, Map.fromList [("a" :: Text, 1 :: Int)])
+        `shouldShow'` [__i|
+            [ { mapKey = "a", mapValue = +1 } ]
+          : List { mapKey : Text, mapValue : Integer }
+        |]
   describe "maybeCodec" do
     it "creates an either with an empty `Left`" do
       (This.encode $ Autodo.maybeCodec Autodo.codec, pure 'a')
