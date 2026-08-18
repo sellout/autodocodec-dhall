@@ -32,8 +32,8 @@ import "aeson" Data.Aeson
     ToJSONKeyFunction (ToJSONKeyText, ToJSONKeyValue),
     toJSONKey,
   )
+import "aeson" Data.Aeson.Key qualified as Key
 import "aeson" Data.Aeson qualified as JSON
-import "aeson" Data.Aeson.Encoding (encodingToLazyByteString)
 import "autodocodec" Autodocodec.Codec qualified as Autodo
 import safe "base" Control.Applicative qualified as Base (pure)
 import safe "base" Control.Category (id, (.))
@@ -172,7 +172,7 @@ hashMap =
   (HashMap.toList . coerce >$<)
     . encodeMap
       ( case toJSONKey of
-          ToJSONKeyText _ f -> encodingToLazyByteString . f >$< Dhall.inject
+          ToJSONKeyText f _ -> Key.toText . f >$< Dhall.inject
           ToJSONKeyValue f _ -> f >$< encodeJSONValue
       )
 
@@ -185,7 +185,7 @@ map =
   (Map.toList . coerce >$<)
     . encodeMap
       ( case toJSONKey of
-          ToJSONKeyText _ f -> encodingToLazyByteString . f >$< Dhall.inject
+          ToJSONKeyText f _ -> Key.toText . f >$< Dhall.inject
           ToJSONKeyValue f _ -> f >$< encodeJSONValue
       )
 
