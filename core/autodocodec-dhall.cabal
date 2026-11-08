@@ -258,6 +258,8 @@ test-suite spec
     string-interpolate ^>= {0.3.4},
     text ^>= {2.0.2, 2.1},
     vector ^>= {0.13.2},
+  autogen-modules:
+    Paths_autodocodec_dhall
   other-modules:
     Paths_autodocodec_dhall
     Spec.DecodeSpec
