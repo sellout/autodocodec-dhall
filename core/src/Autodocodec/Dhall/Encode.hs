@@ -1,6 +1,11 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE Trustworthy #-}
 
+-- |
+-- Copyright: 2025 Greg Pfeil
+-- License: AGPL-3.0-only WITH Universal-FOSS-exception-1.0 OR LicenseRef-proprietary
+--
+-- @since 99999
 module Autodocodec.Dhall.Encode
   ( null,
     bool,
@@ -140,18 +145,26 @@ encodeJSONValue :: Dhall.Encoder JSON.Value
 encodeJSONValue = undefined
 
 -- | @{}@
+--
+-- @since 99999
 null :: (Coercible input ()) => Dhall.Encoder input
 null = coerce >$< (Dhall.inject :: Dhall.Encoder ())
 
 -- | @Bool@
+--
+-- @since 99999
 bool :: (Coercible input Bool) => Dhall.Encoder input
 bool = coerce >$< (Dhall.inject :: Dhall.Encoder Bool)
 
 -- | @Text@
+--
+-- @since 99999
 string :: (Coercible input Text) => Dhall.Encoder input
 string = coerce >$< (Dhall.inject :: Dhall.Encoder Text)
 
 -- | @Integer@ | @Natural@
+--
+-- @since 99999
 integer ::
   (Coercible input Integer) => Autodo.Bounds Integer -> Dhall.Encoder input
 integer (Autodo.Bounds lower _) =
@@ -160,10 +173,14 @@ integer (Autodo.Bounds lower _) =
     else coerce >$< (Dhall.inject :: Dhall.Encoder Integer)
 
 -- | @Double@
+--
+-- @since 99999
 number :: (Coercible input Scientific) => Dhall.Encoder input
 number = coerce >$< (Dhall.inject :: Dhall.Encoder Scientific)
 
 -- | @List { mapKey = k, mapValue = v }@
+--
+-- @since 99999
 hashMap ::
   (ToJSONKey k, Coercible input (HashMap k v)) =>
   Dhall.Encoder v ->
@@ -177,6 +194,8 @@ hashMap =
       )
 
 -- | @List { mapKey = k, mapValue = v }@
+--
+-- @since 99999
 map ::
   (ToJSONKey k, Coercible input (Map k v)) =>
   Dhall.Encoder v ->
@@ -190,17 +209,21 @@ map =
       )
 
 -- | depends on the `valueEncoder` argument
+--
+-- @since 99999
 value :: (Coercible JSON.Value input) => Dhall.Encoder input
 value = coerce >$< encodeJSONValue
 
 -- | @List v@
+--
+-- @since 99999
 arrayOf ::
   (Coercible input (Vector input1)) =>
   Dhall.Encoder input1 ->
   Dhall.Encoder input
 arrayOf = (Seq.fromList . Vector.toList . coerce >$<) . encodeSeq
 
--- |
+-- | Encodes a record.
 --
 --  __TODO__: This is where we /should/ resolve the user’s simplification
 --            preferences – is there only a single field? Does it satisfy
@@ -209,18 +232,24 @@ arrayOf = (Seq.fromList . Vector.toList . coerce >$<) . encodeSeq
 --            name, or particular other type).
 --
 --   Dhall type: @{ k1 : v1, k2 : v2, … }@
+--
+-- @since 99999
 objectOf :: Dhall.RecordEncoder input -> Dhall.Encoder input
 objectOf = Dhall.recordEncoder
 
 -- | This always encodes as the provided @value@.
 --
 --   Dhall type: whatever the input `Autodo.Codec`’s type is.
+--
+-- @since 99999
 eq :: val -> Dhall.Encoder val -> Dhall.Encoder input
 eq v = (const v >$<)
 
--- |
+-- | Pre-processes the value before encoding it.
 --
 --   Dhall type: whatever the input `Autodo.Codec`’s type is.
+--
+-- @since 99999
 bimap :: (Contravariant f) => (input -> oldInput) -> f oldInput -> f input
 bimap g = (g >$<)
 
@@ -241,6 +270,8 @@ bimap g = (g >$<)
 --          union.
 --
 --   Dhall type: @< Left : l | Right : r >@
+--
+-- @since 99999
 either ::
   (Coercible input (Either input1 input2)) =>
   -- | The terminology is a little confusing (at least to me), but if this is
@@ -273,6 +304,8 @@ either union le re =
 --            user wants us to.
 --
 --   Dhall type: @{ p : < c1 : v1, c2 : v2, … > }@
+--
+-- @since 99999
 discriminatedUnion ::
   Text ->
   (input -> (Autodo.Discriminator, Dhall.RecordEncoder input)) ->
@@ -300,27 +333,33 @@ discriminatedUnion property selector constructors =
             declared
           }
 
--- |
+-- | Dhall comments aren’t yet produced, so this is `id`.
 --
 --  __TODO__: We should be able to preserve comments in some cases.
 --
 --   Dhall type: whatever the input `Autodo.Codec`’s type is.
+--
+-- @since 99999
 comment :: Text -> Dhall.Encoder input -> Dhall.Encoder input
 comment _comment = id
 
--- |
+-- | References are inlined, so this is `id`.
 --
 --  __TODO__: This should produce a `Dhall.Var` corresponding to the provided
 --            name and return the mapping between that and the Encoder in a
 --            `Writer`.
 --
 --   Dhall type: whatever the input `Autodo.Codec`’s type is.
+--
+-- @since 99999
 reference :: Text -> Dhall.Encoder input -> Dhall.Encoder input
 reference _name = id
 
--- |
+-- | Encodes a required record field.
 --
 --   Dhall type: @{ k : v }@
+--
+-- @since 99999
 requiredKey ::
   (Coercible input input1) =>
   Text ->
@@ -328,9 +367,11 @@ requiredKey ::
   Dhall.RecordEncoder input
 requiredKey key = Dhall.encodeFieldWith key . (coerce >$<)
 
--- |
+-- | Encodes an optional record field.
 --
 --   Dhall type: @{ k : Optional v }@
+--
+-- @since 99999
 optionalKey ::
   (Coercible input (Maybe input1)) =>
   Text ->
@@ -338,9 +379,11 @@ optionalKey ::
   Dhall.RecordEncoder input
 optionalKey key = Dhall.encodeFieldWith key . contramap coerce . encodeMaybe
 
--- |
+-- | Encodes an optional record field, always present.
 --
 --   Dhall type: @{ k : Optional v }@
+--
+-- @since 99999
 optionalKeyWithDefault ::
   Text ->
   Dhall.Encoder input ->
@@ -348,9 +391,11 @@ optionalKeyWithDefault ::
 optionalKeyWithDefault key =
   Dhall.encodeFieldWith key . contramap Base.pure . encodeMaybe
 
--- |
+-- | Encodes an optional record field, omitting the default value.
 --
 --   Dhall type: @{ k : Optional v }@
+--
+-- @since 99999
 optionalKeyWithOmittedDefault ::
   (Eq val, Coercible input val) =>
   Text ->
@@ -362,17 +407,21 @@ optionalKeyWithOmittedDefault key defaultValue =
     . ((\v -> if v == defaultValue then Nothing else Base.pure v) . coerce >$<)
     . encodeMaybe
 
--- |
+-- | Encodes no fields.
 --
 --   Dhall type: @{}@
+--
+-- @since 99999
 pure :: Dhall.RecordEncoder input
 pure = conquer
 
--- |
+-- | Combines the fields of two record encoders.
 --
 --  __FIXME__: This is probably invalid, and will cause a loop.
 --
 --   Dhall type: @a ⩓ b@
+--
+-- @since 99999
 ap ::
   Dhall.RecordEncoder input ->
   Dhall.RecordEncoder input ->

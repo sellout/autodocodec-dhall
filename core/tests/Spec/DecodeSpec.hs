@@ -3,6 +3,11 @@
 {-# LANGUAGE QuasiQuotes #-}
 {-# LANGUAGE Unsafe #-}
 
+-- |
+-- Copyright: 2025 Greg Pfeil
+-- License: AGPL-3.0-only WITH Universal-FOSS-exception-1.0 OR LicenseRef-proprietary
+--
+-- @since 99999
 module Spec.DecodeSpec (spec) where
 
 import "autodocodec" Autodocodec.Class qualified as Autodo
@@ -45,6 +50,9 @@ shouldParseAs :: (Eq a, Show a) => (Dhall.Decoder a, Text) -> a -> Expectation
 shouldParseAs (decoder, code) value =
   (`shouldBe` value) =<< liftIO (Dhall.input decoder code)
 
+-- | Tests for decoding Dhall via Autodocodec.
+--
+-- @since 99999
 spec :: Spec
 spec = do
   describe "decode" decode
