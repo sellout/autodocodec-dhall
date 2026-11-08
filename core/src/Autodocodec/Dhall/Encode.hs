@@ -32,8 +32,8 @@ import "aeson" Data.Aeson
     ToJSONKeyFunction (ToJSONKeyText, ToJSONKeyValue),
     toJSONKey,
   )
-import "aeson" Data.Aeson.Key qualified as Key
 import "aeson" Data.Aeson qualified as JSON
+import "aeson" Data.Aeson.Key qualified as Key
 import "autodocodec" Autodocodec.Codec qualified as Autodo
 import safe "base" Control.Applicative qualified as Base (pure)
 import safe "base" Control.Category (id, (.))

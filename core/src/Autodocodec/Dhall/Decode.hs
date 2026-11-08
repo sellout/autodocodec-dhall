@@ -253,7 +253,7 @@ optionalKeyWithOmittedDefault k v def =
   maybe (coerce def) coerce <$> parseOptionalField k v
 
 pure :: output -> Dhall.RecordDecoder output
-pure a = Base.pure a
+pure = Base.pure
 
 ap ::
   Dhall.RecordDecoder (output1 -> output) ->

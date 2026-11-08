@@ -1,35 +1,86 @@
 cabal-version: 3.0
+-- ^ Cabal 3.0 is the first with the `Universal-FOSS-exception-1.0` SPDX license
+--   exception.
 
 name: autodocodec-dhall
 version: 0.0.1.0
 synopsis: Autodocodec support for Dhall files
-description: Autodocodec provides generic codecs to convert between many data
-             formats. This adds Dhall to the list of formats.
-author: Greg Pfeil <greg@technomadic.org>
+description:
+  Autodocodec provides generic codecs to convert between many data formats. This
+  adds Dhall to the list of formats.
 maintainer: Greg Pfeil <greg@technomadic.org>
+author: Greg Pfeil <greg@technomadic.org>
 copyright: 2025 Greg Pfeil
-homepage: https://github.com/sellout/autodocodec-dhall#readme
-bug-reports: https://github.com/sellout/autodocodec-dhall/issues
-category: Codecs, Dhall
-build-type: Custom
-license: AGPL-3.0-or-later
+license: AGPL-3.0-only WITH Universal-FOSS-exception-1.0 OR LicenseRef-proprietary
 license-files:
   LICENSE
+  LICENSE.AGPL-3.0-only
+  LICENSE.Universal-FOSS-exception-1.0
+  LICENSE.proprietary
+category: Codecs, Dhall
+build-type: Custom
 extra-doc-files:
   CHANGELOG.md
   README.md
   docs/*.md
 tested-with:
   GHC == {
-    9.6.1, 9.6.3,
+    9.6.1, 9.6.7,
     9.8.1, 9.8.4,
-    9.10.1,
-    9.12.1
+    9.10.1, 9.10.2, 9.10.3,
+    9.12.1, 9.12.2
   }
+
+homepage: https://github.com/sellout/autodocodec-dhall#readme
+bug-reports: https://github.com/sellout/autodocodec-dhall/issues
 
 source-repository head
   type: git
-  location: https://github.com/sellout/autodocodec-dhall
+  location: https://github.com/sellout/autodocodec-dhall.git
+  subdir: core
+
+source-repository this
+  type: git
+  location: https://github.com/sellout/autodocodec-dhall.git
+  subdir: core
+  -- NB: This is the repo version, which is distinct from the package version.
+  tag: v0.1.0
+
+custom-setup
+  setup-depends:
+    -- TODO: Due to haskell/cabal#3751, `Cabal` has to be specified even though
+    --       there’s no direct dependency. Its lower bound needs to be at least
+    --       as high as `cabal-version` at the top of this file, and Hackage
+    --       requires it to have _some_ upper bound. (Since there’s no direct
+    --       dependency, it doesn’t use PVP bounds.)
+    --
+    -- TODO: Due to haskell/cabal#9375, 3.10.3 is required in order to load
+    --       plugins from a `ghc-options` field. Unfortunately, GHCs prior to
+    --       9.8.3 include an older Cabal, so a newer one may need to be
+    --       manually installed.
+    Cabal >= 3.10.3 && < 99,
+    base ^>= {4.18.0, 4.19.0, 4.20.0, 4.21.0, 4.22.0},
+    cabal-doctest ^>= {1.0.0},
+
+flag noisy-deprecations
+  description:
+    Prior to GHC 9.10, the @DEPRECATED@ pragma can’t distinguish between terms
+    and types. Consenquently, you can get spurious warnings when there’s a name
+    collision and the name in the other namespace is deprecated. Or you can
+    choose to not get those warnings, at the risk of not being warned when
+    there’s a name collision and the namespace you’re referencing is the one
+    that’s deprecated.
+  default: True
+  -- Because disabling this flag won’t help the solver.
+  manual: True
+
+flag lint
+  description:
+    Build with linting plugins enabled. This is intended for developers of this
+    package.
+  default: False
+  -- Because disabling this flag won’t help the solver.
+  manual: True
 
 -- This mimics the GHC2024 extension
 -- (https://ghc.gitlab.haskell.org/ghc/doc/users_guide/exts/control.html?highlight=doandifthenelse#extension-GHC2024),
@@ -81,32 +132,21 @@ common GHC2024
     TypeOperators
     UnicodeSyntax
 
-flag noisy-deprecations
-  description:
-    Prior to GHC 9.10, the `DEPRECATED` pragma can’t distinguish between terms
-    and types. Consenquently, you can get spurious warnings when there’s a name
-    collision and the name in the other namespace is deprecated. Or you can
-    choose to not get those warnings, at the risk of not being warned when
-    there’s a name collision and the namespace you’re referencing is the one
-    that’s deprecated.
-
 common defaults
   import: GHC2024
   build-depends:
-    base ^>= {4.18.0, 4.19.0, 4.20.0, 4.21.0},
+    base ^>= {4.18.0, 4.19.0, 4.20.0, 4.21.0, 4.22.0},
+    ghc-compat-plugin ^>= {0.1.0},
   ghc-options:
+    -fplugin GhcCompat
+    -fplugin-opt GhcCompat:minVersion=9.6.1
+    -fplugin-opt GhcCompat:reportIncompatibleExtensions=error
     -Weverything
-    -- This one just reports unfixable things, AFAICT.
-    -Wno-all-missed-specialisations
     -- Type inference good.
     -Wno-missing-local-signatures
     -- Warns even when `Unsafe` is explicit, not inferred. See
     -- https://gitlab.haskell.org/ghc/ghc/-/issues/16689
     -Wno-unsafe
-  if impl(ghc >= 9.8.1)
-    ghc-options:
-      -- Inference good.
-      -Wno-missing-role-annotations
   default-extensions:
     BlockArguments
     DefaultSignatures
@@ -129,26 +169,21 @@ common defaults
     NoStarIsType
     NoTypeApplications
   if flag(noisy-deprecations)
-    cpp-options: -DSELLOUT_NOISY_DEPRECATIONS
-
-custom-setup
-  setup-depends:
-    -- This must match the `cabal-version` at the top of this file.
-    --
-    -- TODO: Remove once haskell/cabal#3751 is fixed.
-    Cabal >= 3.0.0,
-    -- `custom-setup` doesn’t support `import`, so we need to duplicate the
-    -- `base` dependency range from `defaults`.
-    base ^>= {4.18.0, 4.19.0, 4.20.0, 4.21.0},
-    -- `cabal-plan-bounds` doesn’t check bounds for `custom-setup`, so this one
-    -- is manually managed.
-    cabal-doctest ^>= {1.0.0},
+    cpp-options:
+      -DSELLOUT_NOISY_DEPRECATIONS
+  if flag(lint)
+    build-depends:
+      henforcer ^>= {1.0.0},
+      no-recursion,
+    ghc-options:
+      -fplugin Henforcer
+      -fplugin NoRecursion
 
 library
   import: defaults
   hs-source-dirs:
     src
-  -- NB: The hard constraints are listed in the cabal.project file and inform
+  -- NOTE: The hard constraints are listed in the cabal.project file and inform
   --     the bounds here. See there for explanations if these bounds don’t work
   --     in your stack. I’m happy to support wider bounds when feasible.
   build-depends:
@@ -182,7 +217,11 @@ test-suite doctests
   main-is: doctests.hs
   build-depends:
     autodocodec-dhall,
-    doctest ^>= {0.24.2},
+    doctest ^>= {0.24.2, 0.25.0},
+  -- NB: Adjust this to contain any components that may have doctests (including
+  --     executables).
+  x-doctest-components:
+    lib
   -- TODO: The sections below here are necessary because we don’t have control
   --       over the generated `Build_doctests.hs` file. So we have to silence
   --       all of its warnings one way or another.

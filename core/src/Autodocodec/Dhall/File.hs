@@ -13,7 +13,7 @@ import safe "base" Control.Monad ((=<<))
 import safe "base" Data.Function (($))
 import safe "base" Data.Maybe (Maybe (Nothing), maybe)
 import safe "base" System.IO (IO)
-import "dhall" Dhall qualified as Dhall
+import "dhall" Dhall qualified
 import "path" Path (File, Path, toFilePath)
 import "path-io" Path.IO (forgivingAbsence)
 import safe "this" Autodocodec.Dhall qualified as Autodo.Dhall
@@ -28,7 +28,7 @@ read = readFirst . pure
 --
 -- This will output a colourful yaml schema if parsing fails.
 readFirst :: forall a r. (Autodo.HasCodec a) => [Path r File] -> IO (Maybe a)
-readFirst files = go files
+readFirst = go
   where
     go' :: Path r File -> IO (Maybe a)
     go' p =
