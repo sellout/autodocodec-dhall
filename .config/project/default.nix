@@ -65,6 +65,7 @@
 
   programs.vale.vocab.${config.project.name}.accept = [
     "Autodocodec"
+    "codecs"
     "Dhall"
     ## TODO: These are added for "henforcer.toml". When `perPackageFiles` moves
     ##       upstream, move this as well.

@@ -1,4 +1,4 @@
-# autodocodec-dhall
+# Autodocodec for Dhall
 
 [![Hackage Version](https://img.shields.io/hackage/v/autodocodec-dhall)](https://hackage.haskell.org/package/autodocodec-dhall)
 [![Packaging status](https://repology.org/badge/tiny-repos/haskell:autodocodec-dhall.svg)](https://repology.org/project/haskell:autodocodec-dhall/versions)
@@ -10,7 +10,7 @@ Autodocodec provides generic codecs to convert between many data formats. This a
 
 ## usage
 
-**NOTE**: The only two dependencies of this library are [Autodocodec](https://hackage.haskell.org/package/autodocodec) and [Dhall](https://hackage.haskell.org/package/dhall). Everything else that looks like a direct dependency is inherited from one of those two.
+The only two dependencies of this library are [Autodocodec](https://hackage.haskell.org/package/autodocodec) and [Dhall](https://hackage.haskell.org/package/dhall). Everything else that looks like a direct dependency is inherited from one of those two.
 
 - [user guide](https://sellout.github.io/autodocodec-dhall)
 - [comparisons to similar projects](#comparisons)

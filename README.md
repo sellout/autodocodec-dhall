@@ -1,4 +1,4 @@
-# autodocodec-dhall
+# Autodocodec for Dhall
 
 [![GitHub CI](https://github.com/sellout/autodocodec-dhall/actions/workflows/build.yml/badge.svg)](https://github.com/sellout/autodocodec-dhall/actions/workflows/build.yml)
 [![Nix CI](https://nix-ci.com/badge/gh:sellout:autodocodec-dhall)](https://nix-ci.com/gh:sellout:autodocodec-dhall)
