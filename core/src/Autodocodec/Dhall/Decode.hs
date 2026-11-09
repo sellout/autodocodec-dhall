@@ -1,6 +1,11 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE Trustworthy #-}
 
+-- |
+-- Copyright: 2025 Greg Pfeil
+-- License: AGPL-3.0-only WITH Universal-FOSS-exception-1.0 OR LicenseRef-proprietary
+--
+-- @since 99999
 module Autodocodec.Dhall.Decode
   ( null,
     bool,
@@ -78,15 +83,28 @@ import safe "unordered-containers" Data.HashMap.Strict (HashMap)
 import "vector" Data.Vector (Vector)
 import safe "base" Prelude (Integer, undefined)
 
+-- | Decodes @{}@.
+--
+-- @since 99999
 null :: (Coercible output ()) => Dhall.Decoder output
 null = coerce <$> Dhall.Decode.unit
 
+-- | Decodes @Bool@.
+--
+-- @since 99999
 bool :: (Coercible output Bool) => Dhall.Decoder output
 bool = coerce <$> Dhall.Decode.bool
 
+-- | Decodes @Text@.
+--
+-- @since 99999
 string :: (Coercible output Text) => Dhall.Decoder output
 string = coerce <$> Dhall.Decode.strictText
 
+-- | Decodes @Natural@ when the lower bound is non-negative, @Integer@
+--   otherwise, failing on values outside the bounds.
+--
+-- @since 99999
 integer ::
   (Coercible output Integer) => Autodo.Bounds Integer -> Dhall.Decoder output
 integer (Autodo.Bounds lower upper) =
@@ -101,9 +119,15 @@ integer (Autodo.Bounds lower upper) =
       then naturalToInteger <$> Dhall.Decode.natural
       else Dhall.Decode.integer
 
+-- | Decodes @Double@.
+--
+-- @since 99999
 number :: (Coercible output Scientific) => Dhall.Decoder output
 number = coerce <$> Dhall.Decode.scientific
 
+-- | Decodes @List { mapKey : Text, mapValue : v }@.
+--
+-- @since 99999
 hashMap ::
   (Hashable k, FromJSONKey k, Coercible output (HashMap k v)) =>
   Dhall.Decoder v ->
@@ -120,6 +144,9 @@ hashMap =
           <$> Dhall.Decode.strictText
       )
 
+-- | Decodes @List { mapKey : Text, mapValue : v }@.
+--
+-- @since 99999
 map :: (Ord k, FromJSONKey k, Coercible output (Map k v)) => Dhall.Decoder v -> Dhall.Decoder output
 map =
   coerce
@@ -133,6 +160,9 @@ map =
           <$> Dhall.Decode.strictText
       )
 
+-- | JSON values aren’t yet supported, so this always fails.
+--
+-- @since 99999
 value :: (Coercible JSON.Value output) => Dhall.Decoder output
 value =
   coerce
@@ -143,12 +173,21 @@ value =
             Dhall.Decoder JSON.Value
         )
 
+-- | Decodes @List v@.
+--
+-- @since 99999
 arrayOf :: (Coercible output (Vector output1)) => Dhall.Decoder output1 -> Dhall.Decoder output
 arrayOf = fmap coerce . Dhall.Decode.vector
 
+-- | Decodes a record.
+--
+-- @since 99999
 objectOf :: Dhall.RecordDecoder output -> Dhall.Decoder output
 objectOf = Dhall.Decode.record
 
+-- | Succeeds only when the decoded value equals the expected one.
+--
+-- @since 99999
 eq ::
   (Show val, Eq val, Coercible output val) =>
   val ->
@@ -167,9 +206,15 @@ eq expectedValue =
                 <> Text.pack (show actual)
     )
 
+-- | Post-processes the decoded value, failing with the message on `Left`.
+--
+-- @since 99999
 bimap :: (oldOutput -> Either String output) -> Dhall.Decoder oldOutput -> Dhall.Decoder output
 bimap f = bindExtractor (Base.either (Dhall.Decode.extractError . Text.pack) Base.pure . f)
 
+-- | `bimap` for `Dhall.RecordDecoder`.
+--
+-- @since 99999
 bimap' :: (oldOutput -> Either String output) -> Dhall.RecordDecoder oldOutput -> Dhall.RecordDecoder output
 bimap' f (Dhall.RecordDecoder (Pair (Const expected) (Compose extract))) =
   Dhall.RecordDecoder . Pair (Const expected) . Compose $
@@ -180,6 +225,10 @@ bimap' f (Dhall.RecordDecoder (Pair (Const expected) (Compose extract))) =
             <=< Dhall.Decode.toMonadic . extract
         )
 
+-- | Decodes @< Left : l | Right : r >@, or – for an `Autodo.DisjointUnion`
+--   whose alternatives have the same Dhall type – that type alone.
+--
+-- @since 99999
 either ::
   (Coercible output (Either output1 output2)) =>
   Autodo.Union ->
@@ -206,6 +255,9 @@ either union ld rd =
           Dhall.Decode.constructor "Left" (Left <$> ld)
             <> Dhall.Decode.constructor "Right" (Base.pure <$> rd)
 
+-- | Decodes @{ p : < c1 : v1, c2 : v2, … > }@.
+--
+-- @since 99999
 discriminatedUnion ::
   Text ->
   HashMap Autodo.Discriminator (Dhall.RecordDecoder output) ->
@@ -215,12 +267,21 @@ discriminatedUnion property =
     . Dhall.Decode.union
     . ifoldMap (\k -> Dhall.Decode.constructor k . Dhall.Decode.record)
 
+-- | Dhall has no comments to preserve, so this is `id`.
+--
+-- @since 99999
 comment :: Text -> Dhall.Decoder output -> Dhall.Decoder output
 comment _comment = id
 
+-- | References are inlined, so this is `id`.
+--
+-- @since 99999
 reference :: Text -> Dhall.Decoder output -> Dhall.Decoder output
 reference _name = id
 
+-- | Decodes @{ k : v }@.
+--
+-- @since 99999
 requiredKey ::
   (Coercible output output1) =>
   Text ->
@@ -228,6 +289,9 @@ requiredKey ::
   Dhall.RecordDecoder output
 requiredKey key = fmap coerce . Dhall.Decode.field key
 
+-- | Decodes @{ k : Optional v }@.
+--
+-- @since 99999
 optionalKey ::
   (Coercible output (Maybe output1)) =>
   Text ->
@@ -235,6 +299,9 @@ optionalKey ::
   Dhall.RecordDecoder output
 optionalKey key = fmap coerce . parseOptionalField key
 
+-- | Decodes @{ k : Optional v }@, using the default for @None@.
+--
+-- @since 99999
 optionalKeyWithDefault ::
   (Coercible output input) =>
   Text ->
@@ -243,6 +310,9 @@ optionalKeyWithDefault ::
   Dhall.RecordDecoder output
 optionalKeyWithDefault key v def = maybe (coerce def) coerce <$> parseOptionalField key v
 
+-- | Decodes @{ k : Optional v }@, using the default for @None@.
+--
+-- @since 99999
 optionalKeyWithOmittedDefault ::
   (Coercible output val) =>
   Text ->
@@ -252,9 +322,15 @@ optionalKeyWithOmittedDefault ::
 optionalKeyWithOmittedDefault k v def =
   maybe (coerce def) coerce <$> parseOptionalField k v
 
+-- | Decodes @{}@ as the provided value.
+--
+-- @since 99999
 pure :: output -> Dhall.RecordDecoder output
-pure a = Base.pure a
+pure = Base.pure
 
+-- | Combines two record decoders, as `<*>`.
+--
+-- @since 99999
 ap ::
   Dhall.RecordDecoder (output1 -> output) ->
   Dhall.RecordDecoder output1 ->

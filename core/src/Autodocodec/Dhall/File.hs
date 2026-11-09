@@ -1,5 +1,10 @@
 {-# LANGUAGE Trustworthy #-}
 
+-- |
+-- Copyright: 2025 Greg Pfeil
+-- License: AGPL-3.0-only WITH Universal-FOSS-exception-1.0 OR LicenseRef-proprietary
+--
+-- @since 99999
 module Autodocodec.Dhall.File
   ( read,
     readFirst,
@@ -13,7 +18,7 @@ import safe "base" Control.Monad ((=<<))
 import safe "base" Data.Function (($))
 import safe "base" Data.Maybe (Maybe (Nothing), maybe)
 import safe "base" System.IO (IO)
-import "dhall" Dhall qualified as Dhall
+import "dhall" Dhall qualified
 import "path" Path (File, Path, toFilePath)
 import "path-io" Path.IO (forgivingAbsence)
 import safe "this" Autodocodec.Dhall qualified as Autodo.Dhall
@@ -21,14 +26,18 @@ import safe "this" Autodocodec.Dhall qualified as Autodo.Dhall
 -- | Helper function to read a yaml file for a type in 'HasCodec'
 --
 -- This will output a colourful yaml schema if parsing fails.
+--
+-- @since 99999
 read :: (Autodo.HasCodec a) => Path r File -> IO (Maybe a)
 read = readFirst . pure
 
 -- | Helper function to read the first in a list of yaml files for a type is 'HasCodec'
 --
 -- This will output a colourful yaml schema if parsing fails.
+--
+-- @since 99999
 readFirst :: forall a r. (Autodo.HasCodec a) => [Path r File] -> IO (Maybe a)
-readFirst files = go files
+readFirst = go
   where
     go' :: Path r File -> IO (Maybe a)
     go' p =

@@ -1,6 +1,12 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE Trustworthy #-}
+{-# OPTIONS_GHC -fplugin-opt NoRecursion:ignore-decls:decode,decodeObject,encode,encodeObject #-}
 
+-- |
+-- Copyright: 2025 Greg Pfeil
+-- License: AGPL-3.0-only WITH Universal-FOSS-exception-1.0 OR LicenseRef-proprietary
+--
+-- @since 99999
 module Autodocodec.Dhall
   ( declaredObjectVia,
     declaredVia,
@@ -32,11 +38,14 @@ import "dhall" Dhall.Src qualified as Dhall (Src)
 import "this" Autodocodec.Dhall.Decode qualified as Decode
 import "this" Autodocodec.Dhall.Encode qualified as Encode
 
+-- | Converts an Autodocodec value codec to a Dhall decoder.
+--
+-- @since 99999
 decode :: Autodo.ValueCodec void a -> Dhall.Decoder a
 decode = \case
   Autodo.NullCodec -> Decode.null
   Autodo.BoolCodec _ -> Decode.bool
-  Autodo.StringCodec _ -> Decode.string
+  Autodo.StringCodec {} -> Decode.string
   Autodo.IntegerCodec _ bounds -> Decode.integer bounds
   Autodo.NumberCodec _ _ -> Decode.number
   Autodo.HashMapCodec v -> Decode.hashMap $ decode v
@@ -50,11 +59,14 @@ decode = \case
   Autodo.CommentCodec comment c -> Decode.comment comment $ decode c
   Autodo.ReferenceCodec name c -> Decode.reference name $ decode c
 
+-- | Converts an Autodocodec value codec to a Dhall encoder.
+--
+-- @since 99999
 encode :: Autodo.ValueCodec a void -> Dhall.Encoder a
 encode = \case
   Autodo.NullCodec -> Encode.null
   Autodo.BoolCodec _ -> Encode.bool
-  Autodo.StringCodec _ -> Encode.string
+  Autodo.StringCodec {} -> Encode.string
   Autodo.IntegerCodec _ bounds -> Encode.integer bounds
   Autodo.NumberCodec _ _ -> Encode.number
   Autodo.HashMapCodec c -> Encode.hashMap $ encode c
@@ -68,6 +80,9 @@ encode = \case
   Autodo.CommentCodec comment c -> Encode.comment comment $ encode c
   Autodo.ReferenceCodec name c -> Encode.reference name $ encode c
 
+-- | Converts an Autodocodec object codec to a Dhall record decoder.
+--
+-- @since 99999
 decodeObject :: Autodo.ObjectCodec void a -> Dhall.RecordDecoder a
 decodeObject = \case
   Autodo.BimapCodec f _ c -> Decode.bimap' f $ decodeObject c
@@ -87,6 +102,9 @@ decodeObject = \case
   Autodo.PureCodec a -> Decode.pure a
   Autodo.ApCodec f a -> Decode.ap (decodeObject f) $ decodeObject a
 
+-- | Converts an Autodocodec object codec to a Dhall record encoder.
+--
+-- @since 99999
 encodeObject :: Autodo.ObjectCodec a void -> Dhall.RecordEncoder a
 encodeObject = \case
   Autodo.BimapCodec _ g c -> Encode.bimap g $ encodeObject c
@@ -110,27 +128,49 @@ encodeObject = \case
   Autodo.ApCodec oc1 oc2 -> Encode.ap (encodeObject oc1) $ encodeObject oc2
 
 -- | Embed a value into a `Dhall.Expr` using the provided codec.
+--
+-- @since 99999
 embedVia :: Autodo.ValueCodec a void -> a -> Dhall.Expr Dhall.Src Void
 embedVia = Dhall.embed . encode
 
+-- | A Dhall encoder for any type with a `Autodo.HasCodec` instance.
+--
+-- @since 99999
 encodeViaCodec :: (Autodo.HasCodec a) => Dhall.Encoder a
 encodeViaCodec = encode Autodo.codec
 
+-- | Embed a value into a `Dhall.Expr` using its `Autodo.HasCodec` instance.
+--
+-- @since 99999
 embedViaCodec :: (Autodo.HasCodec a) => a -> Dhall.Expr Dhall.Src Void
 embedViaCodec = embedVia Autodo.codec
 
 -- | Returns the Dhall type corresponding to a codec.
+--
+-- @since 99999
 declaredVia :: Autodo.ValueCodec a void -> Dhall.Expr Dhall.Src Void
 declaredVia = Dhall.declared . encode
 
+-- | Embed a value into a Dhall record using the provided object codec.
+--
+-- @since 99999
 embedObjectVia :: Autodo.ObjectCodec a void -> a -> Dhall.Expr Dhall.Src Void
 embedObjectVia = Dhall.embed . Dhall.recordEncoder . encodeObject
 
+-- | Returns the Dhall record type corresponding to an object codec.
+--
+-- @since 99999
 declaredObjectVia :: Autodo.ObjectCodec a void -> Dhall.Expr Dhall.Src Void
 declaredObjectVia = Dhall.declared . Dhall.recordEncoder . encodeObject
 
+-- | A Dhall decoder for any type with a `Autodo.HasCodec` instance.
+--
+-- @since 99999
 decodeViaCodec :: (Autodo.HasCodec a) => Dhall.Decoder a
 decodeViaCodec = decode Autodo.codec
 
+-- | A Dhall decoder for a record, using the provided object codec.
+--
+-- @since 99999
 decodeObjectVia :: Autodo.ObjectCodec void a -> Dhall.Decoder a
 decodeObjectVia = Dhall.Decode.record . decodeObject
