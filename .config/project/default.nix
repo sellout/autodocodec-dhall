@@ -109,8 +109,9 @@
     ## The latest Stackage LTS that we also build on GitHub for.
     latestGhcVersion = "9.10.1";
     checkBounds.extraDependencyVersions = [
-      ## Included in Nixpkgs 25.05, but not picked up by the GitHub build matrix.
-      "autodocodec-0.4.0.0"
+      ## Included in Nixpkgs 26.05, but not picked up by the GitHub build matrix.
+      "autodocodec-0.5.0.0"
+      "doctest-0.24.2"
     ];
   };
   services.nix-ci.allow-import-from-derivation = lib.mkForce true;
