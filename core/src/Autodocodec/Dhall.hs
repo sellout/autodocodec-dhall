@@ -45,7 +45,7 @@ decode :: Autodo.ValueCodec void a -> Dhall.Decoder a
 decode = \case
   Autodo.NullCodec -> Decode.null
   Autodo.BoolCodec _ -> Decode.bool
-  Autodo.StringCodec _ -> Decode.string
+  Autodo.StringCodec {} -> Decode.string
   Autodo.IntegerCodec _ bounds -> Decode.integer bounds
   Autodo.NumberCodec _ _ -> Decode.number
   Autodo.HashMapCodec v -> Decode.hashMap $ decode v
@@ -66,7 +66,7 @@ encode :: Autodo.ValueCodec a void -> Dhall.Encoder a
 encode = \case
   Autodo.NullCodec -> Encode.null
   Autodo.BoolCodec _ -> Encode.bool
-  Autodo.StringCodec _ -> Encode.string
+  Autodo.StringCodec {} -> Encode.string
   Autodo.IntegerCodec _ bounds -> Encode.integer bounds
   Autodo.NumberCodec _ _ -> Encode.number
   Autodo.HashMapCodec c -> Encode.hashMap $ encode c
