@@ -19,6 +19,8 @@ license-files:
   LICENSE.proprietary
 category: Codecs, Dhall
 build-type: Custom
+extra-source-files:
+  henforcer.toml
 extra-doc-files:
   CHANGELOG.md
   README.md
@@ -53,12 +55,7 @@ custom-setup
     --       as high as `cabal-version` at the top of this file, and Hackage
     --       requires it to have _some_ upper bound. (Since there’s no direct
     --       dependency, it doesn’t use PVP bounds.)
-    --
-    -- TODO: Due to haskell/cabal#9375, 3.10.3 is required in order to load
-    --       plugins from a `ghc-options` field. Unfortunately, GHCs prior to
-    --       9.8.3 include an older Cabal, so a newer one may need to be
-    --       manually installed.
-    Cabal >= 3.10.3 && < 99,
+    Cabal >= 3.0 && < 99,
     base ^>= {4.18.0, 4.19.0, 4.20.0, 4.21.0},
     cabal-doctest ^>= {1.0.0},
 
@@ -147,6 +144,10 @@ common defaults
     -- Warns even when `Unsafe` is explicit, not inferred. See
     -- https://gitlab.haskell.org/ghc/ghc/-/issues/16689
     -Wno-unsafe
+    -- These are re-enabled in cabal.project so we can address them (as much
+    -- as possible) without the remainder worrying users.
+    -Wno-all-missed-specialisations
+    -Wno-missed-specialisations
   default-extensions:
     BlockArguments
     DefaultSignatures
